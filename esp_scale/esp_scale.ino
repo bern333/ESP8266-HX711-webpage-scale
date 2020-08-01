@@ -13,7 +13,7 @@ void setup() {
     scale.begin(5, 4);
 
     WiFi.mode(WIFI_STA);
-    WiFi.begin("newnham1_a", "bernardnewnham333");
+    WiFi.begin("ssid", "password");
     Serial.print("Connecting...");
 
     while (WiFi.status() != WL_CONNECTED) {
