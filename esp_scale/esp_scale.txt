@@ -1,24 +1,24 @@
 #include <ESP8266WiFi.h>
 
-#include "HX711.h" //use the included one
+#include "HX711.h"   //use the included one - put it in the same folder so you know it's going to be used.
 
 HX711 scale;
 
-WiFiServer server(80);
+WiFiServer server(80);   //standard port 80
 
 void setup() {
     Serial.begin(115200);
     Serial.println();
         
-    scale.begin(5, 4); //appropriate pins
+    scale.begin(5, 4); // use the appropriate pins for your module. This is for NodeMCU. labelled D1, D2 on the board.
 
-    WiFi.mode(WIFI_STA);
-    WiFi.begin("SSID", "password"); //yours of course
+    WiFi.mode(WIFI_STA);  // configured as a station on another network
+    WiFi.begin("SSID", "password");   // yours of course
     Serial.print("Connecting...");
 
     while (WiFi.status() != WL_CONNECTED) {
         delay(500);
-        Serial.print(".");
+        Serial.print(".");  // loop and print dots to the serial port till connected to the network
     }
     Serial.println();
     Serial.print("Connected, IP address: ");
@@ -31,18 +31,21 @@ void setup() {
 void loop() {
   
   int value;
-   value = scale.read_average(10);
+   value = scale.read_average(10);  //take ten reading from the scale and use the average. Even then it will vary by a few grams each time. 
 
+//  Do a calculation to measure in grams. Below is mine. 
+//  You first get a reading with the scale unloaded - and mine gives around 113300, plus or minus a hundred or two.
+//  Then get another with a known weight. 
+//  Take one from the other and divide by the known weight to get the reading for one gram (or whatever units you're using)
+//  ie (unloaded reading - loaded, divided by the result of the calculation)
 
    value = (113300 - value)/104.6;  
-//this is mine. You get a reading with the scale unloaded, then another
-//with a known weight. Take one from the other and divide by the actual weight to get the reading for one gram or whatever
-// (unloaded reading - loaded, divided by the result of the calculation)
 
-    Serial.println(value);
+   Serial.println(value);
 
- WiFiClient client = server.available();
+  WiFiClient client = server.available(); //make the web server available
 
+//send whatever html you want....
   client.println("HTTP/1.1 200 OK"); //
   client.println("Content-Type: text/html");
   client.println("");
@@ -60,12 +63,11 @@ void loop() {
   client.print("<p style=\"font-size:30px\", \"font-family:verdana;\">Current Weight: </p> ");
   client.print("<p style=\"font-size:30px\">  ");
 
+// Now the calculation result
   client.println(value);
-
- client.print("gm</p> ");
-
+  
+// and finish the html
+  client.print("gm</p> ");
   client.println("</html>");
-
-  return;
 
 }
