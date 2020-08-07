@@ -7,13 +7,14 @@ HX711 scale;
 WiFiServer server(80);   //standard port 80
 
 void setup() {
-    Serial.begin(115200);
+    Serial.begin(115200); //get the serial port going
     Serial.println();
         
-    scale.begin(5, 4); // use the appropriate pins for your module. This is for NodeMCU. labelled D1, D2 on the board.
+    scale.begin(5, 4); // Attach the HX711 SCL, SDA to the appropriate pins for your module. This is for NodeMCU. labelled D1, D2 on the board. 
+    // You obviously need to connect power as well - 3.3v and GND.
 
     WiFi.mode(WIFI_STA);  // configured as a station on another network
-    WiFi.begin("SSID", "password");   // yours of course
+    WiFi.begin("SSID", "password");   // yours, of course
     Serial.print("Connecting...");
 
     while (WiFi.status() != WL_CONNECTED) {
